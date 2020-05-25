@@ -71,5 +71,20 @@
       }
     },
     "transform": {}
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint",
+      "prettier --write"
+    ],
+    "*.md": [
+      "remark-preset-davidtheclark",
+      "remark-preset-davidtheclark --format"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
