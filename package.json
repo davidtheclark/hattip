@@ -1,0 +1,75 @@
+{
+  "name": "hattip",
+  "version": "0.1.0",
+  "description": "An HTTP client that follows key rules of network etiquette while remaining simple and direct",
+  "main": "index.js",
+  "files": [
+    "lib/**/*",
+    "index.js"
+  ],
+  "scripts": {
+    "format-js": "prettier '**/*.js' --write",
+    "format-md": "remark-preset-davidtheclark --format",
+    "format": "npm run format-js && npm run format-md",
+    "lint-js": "eslint .",
+    "lint-md": "remark-preset-davidtheclark",
+    "lint": "npm run lint-js && npm run lint-md",
+    "pretest": "npm run lint",
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidtheclark/hattip.git"
+  },
+  "author": "davidtheclark",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidtheclark/hattip/issues"
+  },
+  "homepage": "https://github.com/davidtheclark/hattip#readme",
+  "devDependencies": {
+    "eslint": "^7.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-node": "^11.1.0",
+    "get-port": "^5.1.1",
+    "husky": "^4.2.5",
+    "jest": "^26.0.1",
+    "jest-circus": "^26.0.1",
+    "lint-staged": "^10.2.6",
+    "prettier": "^2.0.5",
+    "remark-preset-davidtheclark": "^0.12.0"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:node/recommended",
+      "prettier"
+    ]
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRunner": "jest-circus/runner",
+    "clearMocks": true,
+    "coverageReporters": [
+      "text",
+      "html"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    },
+    "transform": {}
+  }
+}
