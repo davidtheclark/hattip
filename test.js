@@ -330,6 +330,7 @@ describe('retries', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({ patience: 'virtue' });
+    expect(response.attemptCount).toBe(3);
     expect(response.failedAttempts).toHaveLength(2);
     expect(response.failedAttempts[0].message).toBe('socket hang up');
     expect(response.failedAttempts[0].code).toBe('ECONNRESET');
@@ -361,6 +362,7 @@ describe('retries', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({ patience: 'virtue' });
+    expect(response.attemptCount).toBe(4);
     expect(response.failedAttempts).toHaveLength(3);
     expect(response.failedAttempts[0].message).toBe('socket hang up');
     expect(response.failedAttempts[0].code).toBe('ECONNRESET');
@@ -399,6 +401,7 @@ describe('retries', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(HattipResponseError);
       expect(error.statusCode).toBe(408);
+      expect(error.attemptCount).toBe(3);
       expect(error.failedAttempts).toHaveLength(2);
       expect(error.failedAttempts[0].message).toBe('socket hang up');
       expect(error.failedAttempts[0].code).toBe('ECONNRESET');
@@ -575,21 +578,19 @@ function runBackoff(fn) {
 describe('hattipBackoff', () => {
   test('defaults', () => {
     const result = runBackoff(hattipBackoff());
-    expect(result).toHaveLength(4);
+    expect(result).toHaveLength(3);
     expect(result[0]).toBeGreaterThan(100);
     expect(result[0]).toBeLessThan(200);
     expect(result[1]).toBeGreaterThan(200);
     expect(result[1]).toBeLessThan(400);
     expect(result[2]).toBeGreaterThan(400);
     expect(result[2]).toBeLessThan(800);
-    expect(result[3]).toBeGreaterThan(800);
-    expect(result[3]).toBeLessThanOrEqual(1000);
   });
 
   test('options', () => {
     const result = runBackoff(
       hattipBackoff({
-        limit: 6,
+        limit: 7,
         minDelay: 50,
         maxDelay: 3000,
         jitter: false,
@@ -597,5 +598,49 @@ describe('hattipBackoff', () => {
       }),
     );
     expect(result).toEqual([1, 100, 200, 400, 800, 1600, 3000]);
+  });
+
+  test('first docs example', () => {
+    const result = runBackoff(
+      hattipBackoff({
+        limit: 6,
+        minDelay: 50,
+        maxDelay: 2000,
+        fastFirst: true,
+      }),
+    );
+    expect(result).toHaveLength(6);
+    expect(result[0]).toBe(1);
+    expect(result[1]).toBeGreaterThan(100);
+    expect(result[1]).toBeLessThan(200);
+    expect(result[2]).toBeGreaterThan(200);
+    expect(result[2]).toBeLessThan(400);
+    expect(result[3]).toBeGreaterThan(400);
+    expect(result[3]).toBeLessThan(800);
+    expect(result[4]).toBeGreaterThan(800);
+    expect(result[4]).toBeLessThan(1600);
+    expect(result[5]).toBeGreaterThan(1600);
+    expect(result[5]).toBeLessThanOrEqual(2000);
+  });
+
+  test('second docs example', () => {
+    const result = runBackoff(
+      hattipBackoff({
+        maxDelay: Infinity,
+        jitter: false,
+      }),
+    );
+    expect(result).toHaveLength(6);
+    expect(result[0]).toBe(1);
+    expect(result[1]).toBeGreaterThan(100);
+    expect(result[1]).toBeLessThan(200);
+    expect(result[2]).toBeGreaterThan(200);
+    expect(result[2]).toBeLessThan(400);
+    expect(result[3]).toBeGreaterThan(400);
+    expect(result[3]).toBeLessThan(800);
+    expect(result[4]).toBeGreaterThan(800);
+    expect(result[4]).toBeLessThan(1600);
+    expect(result[5]).toBeGreaterThan(1600);
+    expect(result[5]).toBeLessThanOrEqual(2000);
   });
 });
